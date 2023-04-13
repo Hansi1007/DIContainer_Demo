@@ -8,7 +8,13 @@ namespace DIContainer_Demo
 
             // Add services to the container.
             builder.Services.AddRazorPages();
-            builder.Services.AddTransient<IDate, ShortDate>();
+
+
+            //builder.Services.AddTransient<IDateTime, Time>();
+            //builder.Services.AddSingleton<IDateTime, Time>();
+            builder.Services.AddScoped<IDateTime, Time>();
+
+            
 
             var app = builder.Build();
 
@@ -17,6 +23,9 @@ namespace DIContainer_Demo
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            app.UseMiddleware<DateCustomMiddleware>();
+
             app.UseStaticFiles();
 
             app.UseRouting();

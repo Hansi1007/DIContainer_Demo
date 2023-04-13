@@ -5,24 +5,31 @@ namespace DIContainer_Demo.Pages
 {
     public class IndexModel : PageModel
     {
+        private readonly IDateTime _date ;
         private readonly ILogger<IndexModel> _logger;
-        private readonly IDate _shortDate;
 
-        public string Date { get; set; } = string.Empty;        
-        public IndexModel(IDate date, ILogger<IndexModel> logger)
+        public IndexModel(IDateTime date, ILogger<IndexModel> logger)
         {
-            _shortDate = date;
-            _logger = logger;
-            _logger.LogInformation("IndexModel with DI of IDate and ILogger: " + Date);
+            _date = date;
+            _logger = logger;   
         }
+
+        public string DateFromDependency { get; set; }
+
+        public string DateFromMiddleware { get; set; }
 
         public void OnGet()
         {
-            // We don't need to create an instance of ShortDate inside the method
-            // var _shortDate = new ShortDate();
-            var date = _shortDate.GetDate();
-            Date = date;
-            _logger.LogInformation("IndexModel OnGet Date: " + Date);
+            if (HttpContext.Items.TryGetValue(DateCustomMiddleware.ContextItemsKey,
+                out var mwDate) && mwDate is string contextItemsKey)
+            {
+                DateFromMiddleware = contextItemsKey;
+            }
+            _logger.LogInformation("Middleware value {MV}",
+                        DateCustomMiddleware.ContextItemsKey?.ToString() ?? "Middleware value not set!");
+
+            var date = _date.GetDate();
+            DateFromDependency = date;
         }
     }
 }
